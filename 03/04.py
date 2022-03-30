@@ -8,14 +8,14 @@ def initialize():
     return 0.1
 
 def eulerForward(currentval, current , nexttime):
-    return currentval + (nexttime-current)*differential(current)
+    return currentval + (nexttime-current)*differential(currentval)
 
 def rungeKutta(currentval,current,  nexttime):
     timediff = (nexttime-current)
-    f1 = timediff * differential(current)
-    f2 = timediff * differential(current+f1/2)
-    f3 = timediff * differential(current+f2/2)
-    f4  = timediff * differential(current+f3)
+    f1 = timediff * differential(currentval)
+    f2 = timediff * differential(currentval+f1/2)
+    f3 = timediff * differential(currentval+f2/2)
+    f4  = timediff * differential(currentval+f3)
     return currentval + f1/6 + f2/3 + f3/3 +f4/6
 
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     logs = []
     logs_kutta = []
     delta_t = 0.01
-    for t in range(100):
+    for t in range(10000):
         logs.append(x)
         logs_kutta.append(x_kutta)
         x = eulerForward(x,t,t+delta_t)
