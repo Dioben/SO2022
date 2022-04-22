@@ -1,21 +1,10 @@
 import argparse  # process command line
 import plotly.express as px  # plotting libs
 import pandas as pd
+from euler import eulerForward,differential
+from kutta import rungeKutta
 
 
-def differential(previousPos, currentPos, timeInterval):
-    velocity = (currentPos - previousPos) / timeInterval
-    return -differential.m * differential.g + differential.u * velocity**2
-
-def eulerForward(previousVal, currentVal, timeInterval):
-    return currentVal + (timeInterval) * differential(previousVal, currentVal, timeInterval)
-
-def rungeKutta(previousVal,currentVal,timeInterval): #TODO: evaluate whether this is remotely right
-    f1 = timeInterval * differential(previousVal,currentVal,timeInterval)
-    f2 = timeInterval * differential(previousVal,currentVal+ f1 / 2, timeInterval/2)
-    f3 = timeInterval * differential(previousVal, currentVal + f2 / 2, timeInterval/2)
-    f4 = timeInterval * differential(previousVal, currentVal + f3, timeInterval*2)
-    return currentVal + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
 
 
 if __name__ == "__main__":

@@ -1,11 +1,8 @@
 import argparse  # process command line
 import plotly.express as px  # plotting libs
 import pandas as pd
+from euler import differential
 
-
-def differential(previousPos, currentPos, timeInterval):
-    velocity = (currentPos - previousPos) / timeInterval
-    return -differential.m * differential.g + differential.u * velocity**2
 
 
 
