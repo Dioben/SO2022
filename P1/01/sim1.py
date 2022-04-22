@@ -1,6 +1,5 @@
 from bisect import insort_right
 from numpy.random import exponential as rndExponential
-from pandas import Timestamp
 
 
 def getNextServer1User(time):
