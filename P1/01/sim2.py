@@ -4,6 +4,7 @@
 #   all code relative to handling server 2 on exit server 1 has been moved there
 from bisect import insort_right
 from numpy.random import exponential as rndExponential
+from random import uniform as rndUniform
 
 
 def getNextServer1User(time):
@@ -13,7 +14,7 @@ def getServer1ExitTime(time):
     return time + rndExponential(.7)
 
 def getServer2EnterTime(time):
-    return time + rndExponential(2)
+    return time + rndUniform(0, 2)
 
 def getServer2ExitTime(time):
     return time + rndExponential(.9)
@@ -159,12 +160,12 @@ if __name__ == "__main__":
     server1QueueSizeAverage/=END_TIME
     server2QueueSizeAverage/=END_TIME
 
-    print("Server 1 Stats:")
+    print(f"{'#'*11} Server 1 Stats {'#'*11}")
     print(f"Average Queue Delay: {server1Delay/server1Served :.3f} minutes")
-    print(f"Use Time: {server1Usage :.3f} minutes")
-    print(f"Average Queue Size: {server1QueueSizeAverage :.3f} users")
+    print(f"           Use Time: {server1Usage :.3f} minutes")
+    print(f" Average Queue Size: {server1QueueSizeAverage :.3f} users")
 
-    print("Server 2 Stats:")
+    print(f"\n{'#'*11} Server 2 Stats {'#'*11}")
     print(f"Average Queue Delay: {server2Delay/server2Served :.3f} minutes")
-    print(f"Use Time: {server2Usage :.3f} minutes")
-    print(f"Average Queue Size: {server2QueueSizeAverage :.3f} users")
+    print(f"           Use Time: {server2Usage :.3f} minutes")
+    print(f" Average Queue Size: {server2QueueSizeAverage :.3f} users")

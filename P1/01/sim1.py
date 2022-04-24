@@ -149,12 +149,12 @@ if __name__ == "__main__":
     server1QueueSizeAverage/=END_TIME
     server2QueueSizeAverage/=END_TIME
 
-    print("Server 1 Stats:")
+    print(f"{'#'*11} Server 1 Stats {'#'*11}")
     print(f"Average Queue Delay: {server1Delay/server1Served :.3f} minutes")
-    print(f"Use Time: {server1Usage :.3f} minutes")
-    print(f"Average Queue Size: {server1QueueSizeAverage :.3f} users")
+    print(f"           Use Time: {server1Usage :.3f} minutes")
+    print(f" Average Queue Size: {server1QueueSizeAverage :.3f} users")
 
-    print("Server 2 Stats:")
+    print(f"\n{'#'*11} Server 2 Stats {'#'*11}")
     print(f"Average Queue Delay: {server2Delay/server2Served :.3f} minutes")
-    print(f"Use Time: {server2Usage :.3f} minutes")
-    print(f"Average Queue Size: {server2QueueSizeAverage :.3f} users")
+    print(f"           Use Time: {server2Usage :.3f} minutes")
+    print(f" Average Queue Size: {server2QueueSizeAverage :.3f} users")
