@@ -1,27 +1,42 @@
 import argparse  # process command line
 import plotly.express as px  # plotting libs
 import pandas as pd
-from euler import eulerForward,differential
+from common import velocity, acceleration
+from euler import eulerForward
 from kutta import rungeKutta
-
-
-
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--initial", help="Initial height", type=float, required=True)
     parser.add_argument(
-        "--initial-derivative", help="Initial derivative", type=float, required=True
+        "--initial",
+        help="Initial height",
+        type=float,
+        required=True
     )
     parser.add_argument(
-        "--mass", help="initial object mass, defaults to 1", type=float, default=1
+        "--initial-derivative",
+        help="Initial derivative (velocity)",
+        type=float,
+        required=True
     )
     parser.add_argument(
-        "--gravity", help="Gravity constant, defaults to 9.81", type=float, default=9.81
+        "--mass",
+        help="initial object mass, defaults to 1",
+        type=float,
+        default=1
     )
     parser.add_argument(
-        "--tick-interval", help="How often data is computed", type=float, default=1
+        "--gravity",
+        help="Gravity constant, defaults to 9.81",
+        type=float,
+        default=9.81
+    )
+    parser.add_argument(
+        "--tick-interval",
+        help="How often data is computed",
+        type=float,
+        default=1
     )
     parser.add_argument(
         "--stop-point",
@@ -35,49 +50,47 @@ if __name__ == "__main__":
         type=float,
         default=0,
     )
-
     args = parser.parse_args()
 
     # assign args to the differential model
-    differential.m = args.mass
-    differential.g = args.gravity
-    differential.u = args.wind_resistance
+    acceleration.m = args.mass
+    acceleration.g = args.gravity
+    acceleration.u = args.wind_resistance
 
     snapshotTimers = [x*args.tick_interval for x in range(int(args.stop_point/args.tick_interval))]
 
-    derivationResults = [None for _ in range(len(snapshotTimers))]
-    positionResults = [None for _ in range(len(snapshotTimers))]
-    derivationResultsKutta = [None for _ in range(len(snapshotTimers))]
+    positionResultsEuler = [None for _ in range(len(snapshotTimers))]
+    velocityResultsEuler = [None for _ in range(len(snapshotTimers))]
+    accelerationResultsEuler = [None for _ in range(len(snapshotTimers))]
+
     positionResultsKutta = [None for _ in range(len(snapshotTimers))]
+    velocityResultsKutta = [None for _ in range(len(snapshotTimers))]
+    accelerationResultsKutta = [None for _ in range(len(snapshotTimers))]
 
-    #start euler
-    positionResults[0] = args.initial
-    derivationResults[0] = args.initial_derivative
+    positionResultsEuler[0] = args.initial
+    velocityResultsEuler[0] = args.initial_derivative
+    accelerationResultsEuler[0] = acceleration(velocityResultsEuler[0])
 
-    positionResults[1] = args.initial + args.tick_interval * args.initial_derivative
-    derivationResults[1] = differential(positionResults[0], positionResults[1], args.tick_interval)
-
-    #start rk4
     positionResultsKutta[0] = args.initial
-    derivationResultsKutta[0] = args.initial_derivative
+    velocityResultsKutta[0] = args.initial_derivative
+    accelerationResultsKutta[0] = acceleration(velocityResultsKutta[0])
 
-    positionResultsKutta[1] = args.initial + args.tick_interval * args.initial_derivative #TODO: ASK LAU WHETHER EULER START IS APPROPRIATE
-    derivationResultsKutta[1] = differential(positionResults[0], positionResults[1], args.tick_interval)
+    for idx in range(1, len(snapshotTimers)):
+        positionResultsEuler[idx] = eulerForward(positionResultsEuler[idx-1], velocityResultsEuler[idx-1], accelerationResultsEuler[idx-1], args.tick_interval)
+        velocityResultsEuler[idx] = velocity(positionResultsEuler[idx-1], positionResultsEuler[idx], args.tick_interval)
+        accelerationResultsEuler[idx] = acceleration(velocityResultsEuler[idx])
 
+        positionResultsKutta[idx] = rungeKutta(positionResultsKutta[idx-1], velocityResultsKutta[idx-1], accelerationResultsKutta[idx-1], args.tick_interval)
+        velocityResultsKutta[idx] = velocity(positionResultsKutta[idx-1], positionResultsKutta[idx], args.tick_interval)
+        accelerationResultsKutta[idx] = acceleration(velocityResultsKutta[idx])
 
-    for idx in range(2, len(snapshotTimers)):
-        #euler
-        derivationResults[idx] = differential(positionResults[idx - 2], positionResults[idx-1], args.tick_interval)
-        positionResults[idx] = eulerForward(positionResults[idx - 2], positionResults[idx-1], args.tick_interval)
-        #rk4
-        derivationResultsKutta[idx] = differential(positionResultsKutta[idx - 2], positionResultsKutta[idx-1], args.tick_interval)
-        positionResultsKutta[idx] = rungeKutta(positionResultsKutta[idx - 2], positionResultsKutta[idx-1], args.tick_interval)
+    mappedData = [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler position", "value": positionResultsEuler[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler velocity", "value": velocityResultsEuler[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler acceleration", "value": accelerationResultsEuler[x]} for x in range(len(snapshotTimers))]
 
-
-    mappedData = [{"time": snapshotTimers[x], "method":"Euler","type": "Euler Position", "value": positionResults[x]}for x in range(len(snapshotTimers))]
-    mappedData += [{"time": snapshotTimers[x],"method":"Euler", "type": "Euler Derivative", "value": derivationResults[x]}for x in range(len(snapshotTimers))]
-    mappedData += [{"time": snapshotTimers[x], "method":"RK4","type": "RK4 Position", "value": positionResultsKutta[x]}for x in range(len(snapshotTimers))]
-    mappedData += [{"time": snapshotTimers[x],"method":"RK4", "type": "RK4 Derivative", "value": derivationResultsKutta[x]}for x in range(len(snapshotTimers))]
+    mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta position", "value": positionResultsKutta[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta velocity", "value": velocityResultsKutta[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta acceleration", "value": accelerationResultsKutta[x]} for x in range(len(snapshotTimers))]
 
     frame = pd.DataFrame(mappedData)
     fig = px.line(frame, x="time", y="value", color="type")

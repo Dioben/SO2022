@@ -1,35 +1,58 @@
 import argparse  # process command line
 import plotly.express as px  # plotting libs
 import pandas as pd
-from euler import differential
+from common import velocity, acceleration
 
+# use rungeKutta to calculate new position then add to position
+def rungeKutta(previousPos, vel, acc, timeInterval):
+    f1 = timeInterval * (vel + acc)
 
+    vel = velocity(previousPos, previousPos+f1/2, timeInterval/2)
+    acc = acceleration(vel)
+    f2 = timeInterval * (vel + acc)
 
+    vel = velocity(previousPos, previousPos+f2/2, timeInterval/2)
+    acc = acceleration(vel)
+    f3 = timeInterval * (vel + acc)
 
+    vel = velocity(previousPos, previousPos+f3, timeInterval)
+    acc = acceleration(vel)
+    f4 = timeInterval * (vel + acc)
 
-def rungeKutta(previousVal,currentVal,timeInterval): #TODO: evaluate whether this is remotely right
-    f1 = timeInterval * differential(previousVal,currentVal,timeInterval)
-    f2 = timeInterval * differential(previousVal,currentVal+ f1 / 2, timeInterval/2)
-    f3 = timeInterval * differential(previousVal, currentVal + f2 / 2, timeInterval/2)
-    f4 = timeInterval * differential(previousVal, currentVal + f3, timeInterval*2)
-    return currentVal + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
-
+    return previousPos + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--initial", help="Initial height", type=float, required=True)
     parser.add_argument(
-        "--initial-derivative", help="Initial derivative", type=float, required=True
+        "--initial",
+        help="Initial height",
+        type=float,
+        required=True
     )
     parser.add_argument(
-        "--mass", help="initial object mass, defaults to 1", type=float, default=1
+        "--initial-derivative",
+        help="Initial derivative (velocity)",
+        type=float,
+        required=True
     )
     parser.add_argument(
-        "--gravity", help="Gravity constant, defaults to 9.81", type=float, default=9.81
+        "--mass",
+        help="initial object mass, defaults to 1",
+        type=float,
+        default=1
     )
     parser.add_argument(
-        "--tick-interval", help="How often data is computed", type=float, default=1
+        "--gravity",
+        help="Gravity constant, defaults to 9.81",
+        type=float,
+        default=9.81
+    )
+    parser.add_argument(
+        "--tick-interval",
+        help="How often data is computed",
+        type=float,
+        default=1
     )
     parser.add_argument(
         "--stop-point",
@@ -43,30 +66,30 @@ if __name__ == "__main__":
         type=float,
         default=0,
     )
-
     args = parser.parse_args()
 
     # assign args to the differential model
-    differential.m = args.mass
-    differential.g = args.gravity
-    differential.u = args.wind_resistance
+    acceleration.m = args.mass
+    acceleration.g = args.gravity
+    acceleration.u = args.wind_resistance
 
-    snapshotTimers = [x*args.tick_interval for x in range(int(args.stop_point/args.tick_interval))]
-    derivationResults = [None for _ in range(len(snapshotTimers))]
+    snapshotTimers = [x * args.tick_interval for x in range(int(args.stop_point / args.tick_interval))]
     positionResults = [None for _ in range(len(snapshotTimers))]
+    velocityResults = [None for _ in range(len(snapshotTimers))]
+    accelerationResults = [None for _ in range(len(snapshotTimers))]
 
     positionResults[0] = args.initial
-    derivationResults[0] = args.initial_derivative
+    velocityResults[0] = args.initial_derivative
+    accelerationResults[0] = acceleration(velocityResults[0])
 
-    positionResults[1] = args.initial + args.tick_interval * args.initial_derivative #TODO: ASK LAU WHETHER EULER START IS APPROPRIATE
-    derivationResults[1] = differential(positionResults[0], positionResults[1], args.tick_interval)
+    for idx in range(1, len(snapshotTimers)):
+        positionResults[idx] = rungeKutta(positionResults[idx-1], velocityResults[idx-1], accelerationResults[idx-1], args.tick_interval)
+        velocityResults[idx] = velocity(positionResults[idx-1], positionResults[idx], args.tick_interval)
+        accelerationResults[idx] = acceleration(velocityResults[idx])
 
-    for idx in range(2, len(snapshotTimers)):
-        derivationResults[idx] = differential(positionResults[idx - 2], positionResults[idx-1], args.tick_interval)
-        positionResults[idx] = rungeKutta(positionResults[idx - 2], positionResults[idx-1], args.tick_interval)
-
-    mappedData = [{"time": snapshotTimers[x], "type": "position", "value": positionResults[x]}for x in range(len(snapshotTimers))]
-    mappedData += [{"time": snapshotTimers[x], "type": "derivative", "value": derivationResults[x]}for x in range(len(snapshotTimers))]
+    mappedData = [{"time": snapshotTimers[x], "type": "position", "value": positionResults[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"time": snapshotTimers[x], "type": "velocity", "value": velocityResults[x]} for x in range(len(snapshotTimers))]
+    mappedData += [{"time": snapshotTimers[x], "type": "acceleration", "value": accelerationResults[x]} for x in range(len(snapshotTimers))]
 
     frame = pd.DataFrame(mappedData)
     fig = px.line(frame, x="time", y="value", color="type")
