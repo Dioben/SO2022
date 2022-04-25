@@ -3,7 +3,6 @@ import plotly.express as px  # plotting libs
 import pandas as pd
 from common import velocity, acceleration
 
-# use rungeKutta to calculate new position then add to position
 def rungeKutta(previousPos, vel, acc, timeInterval):
     f1 = timeInterval * (vel + acc * timeInterval)
 
