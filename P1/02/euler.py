@@ -5,7 +5,7 @@ from common import velocity, acceleration
 
 def eulerForward(previousPos, vel, acc, timeInterval):
     # acceleration is used to add the extra movement caused by it
-    return previousPos + timeInterval * (vel + acc/2 * timeInterval**2)
+    return previousPos + vel * timeInterval + acc/2 * timeInterval**2
 
 if __name__ == "__main__":
 

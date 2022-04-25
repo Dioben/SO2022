@@ -5,19 +5,19 @@ from common import velocity, acceleration
 
 def rungeKutta(previousPos, vel, acc, timeInterval):
     # acceleration is used to add the extra movement caused by it
-    f1 = timeInterval * (vel + acc/2 * timeInterval**2)
+    f1 = vel * timeInterval + acc/2 * timeInterval**2
 
     vel = velocity(previousPos, previousPos+f1/2, timeInterval/2)
     acc = acceleration(vel)
-    f2 = timeInterval * (vel + acc/2 * (timeInterval/2)**2)
+    f2 = vel * timeInterval + acc/2 * timeInterval**2
 
     vel = velocity(previousPos, previousPos+f2/2, timeInterval/2)
     acc = acceleration(vel)
-    f3 = timeInterval * (vel + acc/2 * (timeInterval/2)**2)
+    f3 = vel * timeInterval + acc/2 * timeInterval**2
 
     vel = velocity(previousPos, previousPos+f3, timeInterval)
     acc = acceleration(vel)
-    f4 = timeInterval * (vel + acc/2 * timeInterval**2)
+    f4 = vel * timeInterval + acc/2 * timeInterval**2
 
     return previousPos + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
 
