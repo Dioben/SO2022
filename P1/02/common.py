@@ -1,9 +1,9 @@
 def velocity(previousPos, currentPos, timeInterval):
     return (currentPos - previousPos) / timeInterval
 
-def acceleration(velocity):
+def acceleration(vel):
     try:
-        return -acceleration.g + acceleration.u / acceleration.m * velocity**2
-    except:
-        print("Wind resistance value caused an overflow by making acceleration too big.")
+        return -acceleration.g + acceleration.u / acceleration.m * vel**2
+    except OverflowError:
+        print("Error: Acceleration overflow.")
         exit(1);
