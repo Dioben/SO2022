@@ -4,7 +4,7 @@ import pandas as pd
 from common import velocity, acceleration
 
 def eulerForward(previousPos, vel, acc, timeInterval):
-    return previousPos + timeInterval * (vel + acc)
+    return previousPos + timeInterval * (vel + acc * timeInterval)
 
 if __name__ == "__main__":
 

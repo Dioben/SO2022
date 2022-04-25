@@ -5,19 +5,19 @@ from common import velocity, acceleration
 
 # use rungeKutta to calculate new position then add to position
 def rungeKutta(previousPos, vel, acc, timeInterval):
-    f1 = timeInterval * (vel + acc)
+    f1 = timeInterval * (vel + acc * timeInterval)
 
     vel = velocity(previousPos, previousPos+f1/2, timeInterval/2)
     acc = acceleration(vel)
-    f2 = timeInterval * (vel + acc)
+    f2 = timeInterval * (vel + acc * timeInterval/2)
 
     vel = velocity(previousPos, previousPos+f2/2, timeInterval/2)
     acc = acceleration(vel)
-    f3 = timeInterval * (vel + acc)
+    f3 = timeInterval * (vel + acc * timeInterval/2)
 
     vel = velocity(previousPos, previousPos+f3, timeInterval)
     acc = acceleration(vel)
-    f4 = timeInterval * (vel + acc)
+    f4 = timeInterval * (vel + acc * timeInterval)
 
     return previousPos + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
 
