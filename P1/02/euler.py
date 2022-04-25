@@ -4,7 +4,8 @@ import pandas as pd
 from common import velocity, acceleration
 
 def eulerForward(previousPos, vel, acc, timeInterval):
-    return previousPos + timeInterval * (vel + acc * timeInterval)
+    # acceleration is used to add the extra movement caused by it
+    return previousPos + timeInterval * (vel + acc/2 * timeInterval**2)
 
 if __name__ == "__main__":
 
@@ -68,6 +69,7 @@ if __name__ == "__main__":
     accelerationResults[0] = acceleration(velocityResults[0])
 
     for idx in range(1, len(snapshotTimers)):
+        # position uses the acceleration and velocity the previous step
         positionResults[idx] = eulerForward(positionResults[idx-1], velocityResults[idx-1], accelerationResults[idx-1], args.tick_interval)
         velocityResults[idx] = velocity(positionResults[idx-1], positionResults[idx], args.tick_interval)
         accelerationResults[idx] = acceleration(velocityResults[idx])

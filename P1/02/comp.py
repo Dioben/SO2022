@@ -76,6 +76,7 @@ if __name__ == "__main__":
     accelerationResultsKutta[0] = acceleration(velocityResultsKutta[0])
 
     for idx in range(1, len(snapshotTimers)):
+        # position uses the acceleration and velocity the previous step
         positionResultsEuler[idx] = eulerForward(positionResultsEuler[idx-1], velocityResultsEuler[idx-1], accelerationResultsEuler[idx-1], args.tick_interval)
         velocityResultsEuler[idx] = velocity(positionResultsEuler[idx-1], positionResultsEuler[idx], args.tick_interval)
         accelerationResultsEuler[idx] = acceleration(velocityResultsEuler[idx])

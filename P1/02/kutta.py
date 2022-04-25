@@ -4,19 +4,20 @@ import pandas as pd
 from common import velocity, acceleration
 
 def rungeKutta(previousPos, vel, acc, timeInterval):
-    f1 = timeInterval * (vel + acc * timeInterval)
+    # acceleration is used to add the extra movement caused by it
+    f1 = timeInterval * (vel + acc/2 * timeInterval**2)
 
     vel = velocity(previousPos, previousPos+f1/2, timeInterval/2)
     acc = acceleration(vel)
-    f2 = timeInterval * (vel + acc * timeInterval/2)
+    f2 = timeInterval * (vel + acc/2 * (timeInterval/2)**2)
 
     vel = velocity(previousPos, previousPos+f2/2, timeInterval/2)
     acc = acceleration(vel)
-    f3 = timeInterval * (vel + acc * timeInterval/2)
+    f3 = timeInterval * (vel + acc/2 * (timeInterval/2)**2)
 
     vel = velocity(previousPos, previousPos+f3, timeInterval)
     acc = acceleration(vel)
-    f4 = timeInterval * (vel + acc * timeInterval)
+    f4 = timeInterval * (vel + acc/2 * timeInterval**2)
 
     return previousPos + f1 / 6 + f2 / 3 + f3 / 3 + f4 / 6
 
@@ -82,6 +83,7 @@ if __name__ == "__main__":
     accelerationResults[0] = acceleration(velocityResults[0])
 
     for idx in range(1, len(snapshotTimers)):
+        # position uses the acceleration and velocity the previous step
         positionResults[idx] = rungeKutta(positionResults[idx-1], velocityResults[idx-1], accelerationResults[idx-1], args.tick_interval)
         velocityResults[idx] = velocity(positionResults[idx-1], positionResults[idx], args.tick_interval)
         accelerationResults[idx] = acceleration(velocityResults[idx])
