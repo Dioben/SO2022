@@ -1,9 +1,9 @@
 import argparse  # process command line
 import plotly.express as px  # plotting libs
 import pandas as pd
-from common import velocity, acceleration
-from euler import eulerForward
-from kutta import rungeKutta
+from common import acceleration
+from euler import eulerPosition, eulerVelocity
+from kutta import kuttaPosition, kuttaVelocity
 
 if __name__ == "__main__":
 
@@ -61,37 +61,29 @@ if __name__ == "__main__":
 
     positionResultsEuler = [None for _ in range(len(snapshotTimers))]
     velocityResultsEuler = [None for _ in range(len(snapshotTimers))]
-    accelerationResultsEuler = [None for _ in range(len(snapshotTimers))]
 
     positionResultsKutta = [None for _ in range(len(snapshotTimers))]
     velocityResultsKutta = [None for _ in range(len(snapshotTimers))]
-    accelerationResultsKutta = [None for _ in range(len(snapshotTimers))]
 
     positionResultsEuler[0] = args.initial
     velocityResultsEuler[0] = args.initial_derivative
-    accelerationResultsEuler[0] = acceleration(velocityResultsEuler[0])
 
     positionResultsKutta[0] = args.initial
     velocityResultsKutta[0] = args.initial_derivative
-    accelerationResultsKutta[0] = acceleration(velocityResultsKutta[0])
 
     for idx in range(1, len(snapshotTimers)):
-        # position uses the acceleration and velocity the previous step
-        positionResultsEuler[idx] = eulerForward(positionResultsEuler[idx-1], velocityResultsEuler[idx-1], accelerationResultsEuler[idx-1], args.tick_interval)
-        velocityResultsEuler[idx] = velocity(positionResultsEuler[idx-1], positionResultsEuler[idx], args.tick_interval)
-        accelerationResultsEuler[idx] = acceleration(velocityResultsEuler[idx])
+        # position and velocity use the previous step to calculate
+        positionResultsEuler[idx] = eulerPosition(positionResultsEuler[idx-1], velocityResultsEuler[idx-1], args.tick_interval)
+        velocityResultsEuler[idx] = eulerVelocity(velocityResultsEuler[idx-1], args.tick_interval)
 
-        positionResultsKutta[idx] = rungeKutta(positionResultsKutta[idx-1], velocityResultsKutta[idx-1], accelerationResultsKutta[idx-1], args.tick_interval)
-        velocityResultsKutta[idx] = velocity(positionResultsKutta[idx-1], positionResultsKutta[idx], args.tick_interval)
-        accelerationResultsKutta[idx] = acceleration(velocityResultsKutta[idx])
+        positionResultsKutta[idx] = kuttaPosition(positionResultsKutta[idx-1], velocityResultsKutta[idx-1], args.tick_interval)
+        velocityResultsKutta[idx] = kuttaVelocity(velocityResultsKutta[idx-1], args.tick_interval)
 
     mappedData = [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler position", "value": positionResultsEuler[x]} for x in range(len(snapshotTimers))]
     mappedData += [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler velocity", "value": velocityResultsEuler[x]} for x in range(len(snapshotTimers))]
-    mappedData += [{"method": "Euler", "time": snapshotTimers[x], "type": "Euler acceleration", "value": accelerationResultsEuler[x]} for x in range(len(snapshotTimers))]
 
     mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta position", "value": positionResultsKutta[x]} for x in range(len(snapshotTimers))]
     mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta velocity", "value": velocityResultsKutta[x]} for x in range(len(snapshotTimers))]
-    mappedData += [{"method": "Kutta", "time": snapshotTimers[x], "type": "Kutta acceleration", "value": accelerationResultsKutta[x]} for x in range(len(snapshotTimers))]
 
     frame = pd.DataFrame(mappedData)
     fig = px.line(frame, x="time", y="value", color="type")
