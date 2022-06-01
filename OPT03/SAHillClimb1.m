@@ -7,8 +7,7 @@ function [result, result_nodes] = SAHillClimb1(G, s, func)
     result = func(G, result_nodes);
     improved = true;
     while improved
-        D = [];
-        r = inf;
+        r = result;
         nnodes = setdiff(1:nNodes, result_nodes);
         for a=result_nodes
             for b=nnodes
