@@ -12,8 +12,8 @@ function [result,result_nodes] = Memetic(G,n,time,pop,elit,mut,func,HCfunc)
     P = [];
     for i=1:pop
         x = randperm(nNodes, n);
-        % P = [P ; HCfunc(G,x,func)];
-        P = [P; func(G,x) x];
+        [r, r2] = HCfunc(G,x,func);
+        P = [P; r r2];
     end
     while toc(t) < time
         P2 = [];
@@ -30,7 +30,7 @@ function [result,result_nodes] = Memetic(G,n,time,pop,elit,mut,func,HCfunc)
     end
     best = sortrows(P);
     result = best(1,1);
-    result_nodes = best(2,length(best)-1);
+    result_nodes = best(1,2:length(best)-1);
 end
 
 function [child] = Crossover(P,G,func)
@@ -60,17 +60,16 @@ end
 
 function [x] = Mutation(x,nNodes,G,func)
     x(:,1) = [];
-    x = x(:,randperm(length(x),length(x)-1));
     y = setdiff(1:nNodes,x);
+    x = x(:,randperm(length(x),length(x)-1));
     y = y(:,randperm(length(y),1));
     x = [x y];
     x = [func(G,x) x];
 end
 
 function [P3] = Selection(P,P2,elit)
-    P
-    P2
-    P3 = sortrows([P P2])
-    elits = P3(1,elit);
-    P3 = [elits randperm(setdiff(P3,elits),length(P)-elit)];
+    P3 = sortrows(union(P,P2,'rows'));
+    elits = P3(1:elit,:);
+    P3(1,:) = [];
+    P3 = [elits ; P3(randperm(size(P3,1),size(P,1)-elit),:)];
 end
