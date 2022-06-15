@@ -54,4 +54,5 @@ function [Nodes,Links,L]= generateTopology(num)
     for i= 1:size(Links,1)
         L(Links(i,1),Links(i,2))= Ltotal(Links(i,1),Links(i,2));
     end
+    L = L+L';
 end
