@@ -22,7 +22,7 @@ for i= 1:nodeCount-1
         else %%scope out neighbourhood for possible connections
             fprintf(fid,'\\\\no direct link between %d,%d\n',i,j);
             for k=find(linkMatrix(i,:)>0)
-                fprintf(fid,'+ l%d_%d - l%d_%d - l%d_%d - n%d>= -1\n', i,j, i,k, k,j ,k );
+                fprintf(fid,'+ l%d_%d - l%d_%d - l%d_%d - n%d>= -1\n', i,j,  min(i,k),max(i,k), min(k,j),max(k,j)  ,k );
             end
         end
     end
