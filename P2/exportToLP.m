@@ -34,10 +34,5 @@ fprintf(fid,'binary\n');
 for i=1:nodeCount
     fprintf(fid,'n%d ',i);
 end
-for i=1:nodeCount
-    for j=i+1:nodeCount
-        fprintf(fid,'l%d_%d ',i,j);
-    end
-end
 fprintf(fid,'\nend');
 fclose(fid);
