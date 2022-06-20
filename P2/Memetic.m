@@ -60,9 +60,10 @@ end
 
 function [individual] = Mutation(individual,nNodes,G,ResFunc)
     individual(:,1) = [];
+    indLength = length(individual);
     otherNodes = setdiff(1:nNodes,individual);
-    individual = individual(:,randperm(length(individual),length(individual)-1));
-    otherNodes = otherNodes(:,randperm(length(otherNodes),1));
+    individual = individual(:,randperm(indLength,randi(indLength-1)))
+    otherNodes = otherNodes(:,randperm(length(otherNodes),indLength-length(individual)))
     individual = [individual otherNodes];
     individual = [ResFunc(G,individual) individual];
 end
