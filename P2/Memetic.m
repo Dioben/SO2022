@@ -30,7 +30,7 @@ function [final_result,final_nodes] = Memetic(G,n,time,nPop,elitism,mutChance,Re
     end
     best = sortrows(population);
     final_result = best(1,1);
-    final_nodes = best(1,2:length(best)-1);
+    final_nodes = best(1,2:size(best,2)-1);
 end
 
 function [child] = Crossover(population,G,ResFunc)
