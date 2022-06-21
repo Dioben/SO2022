@@ -27,7 +27,8 @@ if False:
     print(df2)
 
     df["run"] = df.groupby(["n"]).cumcount()+1
-    fig = px.line(df, x="run", y="result", color="n", title="5 min GRASP")
+    df["n"] = df["n"].astype(str)
+    fig = px.scatter(df, x="run", y="result", color="n", title="5 min GRASP")
     fig.show()
 
 ### Memetic final
@@ -37,5 +38,6 @@ if False:
     print(df2)
 
     df["run"] = df.groupby(["n"]).cumcount()+1
-    fig = px.line(df, x="run", y="time", color="n", title="Best memetic")
+    df["n"] = df["n"].astype(str)
+    fig = px.scatter(df, x="run", y="time", color="n", title="Best memetic")
     fig.show()
