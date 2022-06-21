@@ -9,9 +9,9 @@ G = graph(L);
 
 % results = [];
 % for n=[8,12]
-% for time=[60]
+% for time=[1,30,60]
 % for r=[1,2,3,4,5,6,7,8,9,10]
-% results = [results; n time r GRASP(G,n,time,r,@ConnectedNP,@SAHillClimb1) GRASP(G,n,time,r,@ConnectedNP,@SAHillClimb2)];
+% results = [results; n time r GRASP(G,n,time,r,@ConnectedNP,@SAHillClimb1)];
 % writematrix(results,"GRASP.csv");
 % end
 % end
@@ -19,10 +19,10 @@ G = graph(L);
 
 % results = [];
 % for n=[8,12]
-% for time=[30]
+% for time=[1,30]
 % for nPop=[5,10,15]
 % for elitism=[1,2,3,4]
-% for mutChance=[0,0.25,0.5,0.75,1]
+% for mutChance=[0,0.1,0.25,0.5,0.75,1]
 % results = [results; n time nPop elitism mutChance Memetic(G,n,time,nPop,elitism,mutChance,@ConnectedNP,@SAHillClimb1) Memetic(G,n,time,nPop,elitism,mutChance,@ConnectedNP,@SAHillClimb2)];
 % writematrix(results,"Memetic.csv");
 % end
@@ -30,3 +30,4 @@ G = graph(L);
 % end
 % end
 % end
+
